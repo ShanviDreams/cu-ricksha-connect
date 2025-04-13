@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { driverAPI } from '@/services/api';
+import socketService from '@/services/socket';
 import DriverCard from './DriverCard';
 import { toast } from 'sonner';
 
@@ -30,10 +31,25 @@ const DriverList = () => {
   useEffect(() => {
     fetchDrivers();
     
-    // Poll for driver updates every 10 seconds
-    const interval = setInterval(fetchDrivers, 10000);
+    // Initialize socket connection
+    const socket = socketService.init();
     
-    return () => clearInterval(interval);
+    // Subscribe to driver status updates
+    socketService.subscribeToDriverUpdates(({ driverId, isAvailable }) => {
+      setDrivers(prevDrivers => 
+        prevDrivers.map(driver => 
+          driver._id === driverId 
+            ? { ...driver, isAvailable } 
+            : driver
+        )
+      );
+    });
+    
+    return () => {
+      // Cleanup socket listeners
+      socketService.unsubscribeFromDriverUpdates();
+      socketService.disconnect();
+    };
   }, []);
 
   return (

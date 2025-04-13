@@ -32,7 +32,8 @@ export const authAPI = {
     mobileNumber?: string;
     role: 'teacher' | 'driver' 
   }) => {
-    const response = await api.post('/auth/login', credentials);
+    const endpoint = credentials.role === 'teacher' ? '/auth/teacher/login' : '/auth/driver/login';
+    const response = await api.post(endpoint, credentials);
     return response.data;
   },
   
@@ -43,7 +44,8 @@ export const authAPI = {
     mobileNumber?: string;
     role: 'teacher' | 'driver';
   }) => {
-    const response = await api.post('/auth/signup', userData);
+    const endpoint = userData.role === 'teacher' ? '/auth/teacher/signup' : '/auth/driver/signup';
+    const response = await api.post(endpoint, userData);
     return response.data;
   },
 };

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { driverAPI } from '@/services/api';
+import socketService from '@/services/socket';
 import { toast } from 'sonner';
 import { Check, X } from 'lucide-react';
 
@@ -26,6 +27,11 @@ const AvailabilityToggle = () => {
       
       if (updateUserAvailability) {
         updateUserAvailability(newStatus);
+      }
+      
+      // Emit status change to other clients via Socket.IO
+      if (user) {
+        socketService.emitDriverStatusChange(user.id, newStatus);
       }
       
       toast.success(`You are now ${newStatus ? 'available' : 'unavailable'} for rides`);
