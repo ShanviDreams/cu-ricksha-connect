@@ -37,6 +37,9 @@ const SignupForm = () => {
 
     try {
       setIsLoading(true);
+      console.log('Teacher signup payload:', { name: teacherName, employeeId, password, role: 'teacher' });
+      
+      // Use the local API for testing if in development environment
       const response = await authAPI.signup({
         name: teacherName,
         employeeId,
@@ -44,11 +47,14 @@ const SignupForm = () => {
         role: 'teacher'
       });
       
+      console.log('Signup successful:', response);
       toast.success('Signup successful! Please login.');
       navigate('/login');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Signup error:', error);
-      toast.error('Signup failed. Please try again.');
+      // Show more specific error message if available from the API response
+      const errorMessage = error.response?.data?.message || 'Signup failed. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -63,17 +69,22 @@ const SignupForm = () => {
 
     try {
       setIsLoading(true);
+      console.log('Driver signup payload:', { name: driverName, mobileNumber, role: 'driver' });
+      
       const response = await authAPI.signup({
         name: driverName,
         mobileNumber,
         role: 'driver'
       });
       
+      console.log('Signup successful:', response);
       toast.success('Signup successful! Please login.');
       navigate('/login');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Signup error:', error);
-      toast.error('Signup failed. Please try again.');
+      // Show more specific error message if available from the API response
+      const errorMessage = error.response?.data?.message || 'Signup failed. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
