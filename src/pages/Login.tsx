@@ -15,7 +15,7 @@ const Login = () => {
       }}
     >
       <div className="bg-white dark:bg-black/70 p-8 rounded-lg shadow-lg w-full max-w-md mx-4 animate-scale-in">
-        <h1 className="text-3xl font-bold mb-6 text-center text-cu-blue">CU E-Ricksha Login</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center text-cu-blue">CU E-Rickshaw Login</h1>
         <LoginForm />
         <div className="mt-6 text-center text-sm">
           <p>

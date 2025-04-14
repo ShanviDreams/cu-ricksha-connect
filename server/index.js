@@ -22,10 +22,13 @@ app.use(express.json());
 app.use(cors());
 
 // Database Connection
-const MONGODB_URI = process.env.MONGODB_URI;
-mongoose.connect(MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://akashlakhwan2329:dJ9oa05hjGmONfCP@cu-e-ricksha.57x2ymc.mongodb.net/cu-e-ricksha?retryWrites=true&w=majority';
+mongoose.connect(MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+  .then(() => console.log('✅ MongoDB connected'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
 
 // Socket.IO Connection
 io.on('connection', (socket) => {
@@ -47,7 +50,7 @@ app.use('/api/drivers', driverRoutes);
 
 // Root route
 app.get('/', (req, res) => {
-  res.send('CU E-Ricksha API is running');
+  res.send('CU E-Rickshaw API is running');
 });
 
 // Error handler

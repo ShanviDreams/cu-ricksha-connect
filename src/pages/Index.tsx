@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
@@ -8,7 +9,7 @@ const Index = () => {
       <div 
         className="relative flex flex-col items-center justify-center py-20 px-4 text-center"
         style={{
-          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("https://scontent.fluh1-2.fna.fbcdn.net/v/t1.6435-9/191230189_3739112682862090_9220374159950932563_n.jpg")',
+          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("https://blogger.googleusercontent.com/img/a/AVvXsEhhTgvVUO5-bFLFJXtTovOE_f4gMjD1ACVzTfZNKtZonYTe77nV8dSeymhqePAkIFqdKMMvTcAfyFyE2KHVdn5E2wlmQM2y_4ukcw-1Op7EE60jOXY-2qwAqSXvThKC8ldt6LLcdOUYLMNyQvQyXeNT5YEq590_0Nq_frXh9WzPEmUx55T1Ufyj-SLkfw=s16000")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -17,7 +18,7 @@ const Index = () => {
       >
         <div className="max-w-3xl mx-auto">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-            Welcome! CU E-Ricksha
+            Welcome! CU E-Rickshaw
           </h1>
           <p className="text-lg md:text-xl text-white/90 mb-8">
             The convenient and eco-friendly way to travel around Chandigarh University campus
@@ -48,7 +49,7 @@ const Index = () => {
               </div>
               <h3 className="text-xl font-semibold mb-3">Sign Up</h3>
               <p className="text-gray-600 dark:text-gray-400">
-                Register as a teacher or driver to use the CU E-Ricksha service
+                Register as a teacher or driver to use the CU E-Rickshaw service
               </p>
             </div>
             
