@@ -4,6 +4,7 @@ import { driverAPI } from '@/services/api';
 import socketService from '@/services/socket';
 import DriverCard from './DriverCard';
 import { toast } from 'sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Driver {
   _id: string;
@@ -15,6 +16,7 @@ interface Driver {
 const DriverList = () => {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'all' | 'available' | 'unavailable'>('all');
 
   const fetchDrivers = async () => {
     try {
@@ -52,10 +54,18 @@ const DriverList = () => {
     };
   }, []);
 
+  // Filter drivers based on active tab
+  const filteredDrivers = drivers.filter(driver => {
+    if (activeTab === 'all') return true;
+    if (activeTab === 'available') return driver.isAvailable;
+    if (activeTab === 'unavailable') return !driver.isAvailable;
+    return true;
+  });
+
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Available Drivers</h2>
+        <h2 className="text-2xl font-bold">Drivers</h2>
         <button 
           onClick={fetchDrivers}
           className="text-sm flex items-center text-primary hover:underline"
@@ -63,14 +73,26 @@ const DriverList = () => {
           Refresh
         </button>
       </div>
+
+      <Tabs 
+        defaultValue="all"
+        className="mb-6"
+        onValueChange={(value) => setActiveTab(value as 'all' | 'available' | 'unavailable')}
+      >
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="all">All Drivers</TabsTrigger>
+          <TabsTrigger value="available">Available</TabsTrigger>
+          <TabsTrigger value="unavailable">Unavailable</TabsTrigger>
+        </TabsList>
+      </Tabs>
       
       {loading ? (
         <div className="flex justify-center items-center h-40">
           <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
         </div>
-      ) : drivers.length > 0 ? (
+      ) : filteredDrivers.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {drivers.map((driver) => (
+          {filteredDrivers.map((driver) => (
             <DriverCard
               key={driver._id}
               id={driver._id}
@@ -82,7 +104,7 @@ const DriverList = () => {
         </div>
       ) : (
         <div className="text-center py-10 text-gray-500 dark:text-gray-400">
-          No drivers available at the moment.
+          No drivers found in this category.
         </div>
       )}
     </div>

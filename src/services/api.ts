@@ -35,7 +35,11 @@ const mockUsers = {
     { id: 'teacher1', name: 'Test Teacher', employeeId: 'T12345', role: 'teacher' }
   ],
   drivers: [
-    { id: 'driver1', name: 'Test Driver', mobileNumber: '1234567890', isAvailable: true, role: 'driver' }
+    { id: 'driver1', name: 'Test Driver', mobileNumber: '1234567890', isAvailable: true, role: 'driver' },
+    { id: 'driver2', name: 'Busy Driver', mobileNumber: '0987654321', isAvailable: false, role: 'driver' }
+  ],
+  messages: [
+    { id: 'msg1', from: 'teacher1', to: 'driver1', text: 'Can you pick me up from Science Block at 2pm?', status: 'pending', timestamp: new Date().toISOString() }
   ]
 };
 
@@ -119,6 +123,30 @@ export const authAPI = {
       throw error;
     }
   },
+
+  // New method for deleting account
+  deleteAccount: async (userId: string, role: 'teacher' | 'driver') => {
+    if (isDev) {
+      console.log('Using mock account deletion for development');
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+      
+      if (role === 'teacher') {
+        mockUsers.teachers = mockUsers.teachers.filter(t => t.id !== userId);
+      } else {
+        mockUsers.drivers = mockUsers.drivers.filter(d => d.id !== userId);
+      }
+      return { success: true, message: 'Account deleted successfully' };
+    }
+
+    const endpoint = `/auth/${role}/delete-account`;
+    try {
+      const response = await api.delete(endpoint);
+      return response.data;
+    } catch (error) {
+      console.error('Account deletion API error:', error);
+      throw error;
+    }
+  }
 };
 
 // Driver APIs
@@ -136,12 +164,65 @@ export const driverAPI = {
   
   getAllDrivers: async () => {
     if (isDev) {
-      console.log('Getting mock drivers');
+      console.log('Getting all mock drivers (including unavailable ones)');
       await new Promise(resolve => setTimeout(resolve, 500));
-      return { drivers: mockUsers.drivers.filter(d => d.isAvailable) };
+      return mockUsers.drivers;
     }
     
     const response = await api.get('/drivers');
+    return response.data;
+  },
+};
+
+// Message APIs
+export const messageAPI = {
+  sendMessage: async (to: string, text: string) => {
+    if (isDev) {
+      console.log(`Mock: Sending message to ${to}: ${text}`);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const message = {
+        id: `msg${Date.now()}`,
+        from: mockUsers.teachers[0].id, // Assuming current user is the first teacher
+        to,
+        text,
+        status: 'pending',
+        timestamp: new Date().toISOString()
+      };
+      
+      mockUsers.messages.push(message);
+      return message;
+    }
+    
+    const response = await api.post('/messages', { to, text });
+    return response.data;
+  },
+  
+  getMessages: async () => {
+    if (isDev) {
+      console.log('Getting mock messages');
+      await new Promise(resolve => setTimeout(resolve, 500));
+      return mockUsers.messages;
+    }
+    
+    const response = await api.get('/messages');
+    return response.data;
+  },
+  
+  updateMessageStatus: async (messageId: string, status: 'accepted' | 'rejected') => {
+    if (isDev) {
+      console.log(`Mock: Updating message ${messageId} status to ${status}`);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const message = mockUsers.messages.find(m => m.id === messageId);
+      if (message) {
+        message.status = status;
+      }
+      
+      return { success: true, message };
+    }
+    
+    const response = await api.put(`/messages/${messageId}/status`, { status });
     return response.data;
   },
 };
