@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '@/context/ThemeContext';
@@ -24,7 +23,7 @@ const Header = () => {
                 alt="CU Logo" 
                 className="h-10 w-auto"
               />
-              <span className="ml-2 text-xl font-bold">CU E-Ricksha</span>
+              <span className="ml-2 text-xl font-bold">CU E-Rickshaw</span>
             </Link>
           </div>
 
@@ -83,58 +82,6 @@ const Header = () => {
             </Button>
           </div>
         </nav>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden py-4 space-y-3">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={toggleTheme}
-              className="flex items-center w-full justify-start text-white hover:bg-primary/80"
-            >
-              {theme === 'dark' ? <Sun className="mr-2" size={18} /> : <Moon className="mr-2" size={18} />}
-              {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-            </Button>
-
-            {isAuthenticated ? (
-              <>
-                <div className="text-sm py-1">
-                  Welcome, {user?.name} ({user?.role})
-                </div>
-                <Button 
-                  variant="secondary" 
-                  onClick={logout}
-                  size="sm"
-                  className="w-full bg-cu-gold text-black hover:bg-cu-gold/90"
-                >
-                  Logout
-                </Button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="block">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="w-full text-white hover:bg-primary/80"
-                  >
-                    Login
-                  </Button>
-                </Link>
-                <Link to="/signup" className="block">
-                  <Button 
-                    variant="secondary" 
-                    size="sm"
-                    className="w-full bg-cu-gold text-black hover:bg-cu-gold/90"
-                  >
-                    Sign Up
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
-        )}
       </div>
     </header>
   );

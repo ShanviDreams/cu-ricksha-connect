@@ -9,7 +9,7 @@ const Index = () => {
       <div 
         className="relative flex flex-col items-center justify-center py-20 px-4 text-center"
         style={{
-          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("https://blogger.googleusercontent.com/img/a/AVvXsEhhTgvVUO5-bFLFJXtTovOE_f4gMjD1ACVzTfZNKtZonYTe77nV8dSeymhqePAkIFqdKMMvTcAfyFyE2KHVdn5E2wlmQM2y_4ukcw-1Op7EE60jOXY-2qwAqSXvThKC8ldt6LLcdOUYLMNyQvQyXeNT5YEq590_0Nq_frXh9WzPEmUx55T1Ufyj-SLkfw=s16000")',
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("${import.meta.env.VITE_BACKGROUND_IMAGE || 'public/lovable-uploads/c4dfb9a9-1f50-4e11-b55c-5b32e852f067.png'}")`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
