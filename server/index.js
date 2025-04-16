@@ -7,6 +7,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const authRoutes = require('./routes/auth.routes');
 const driverRoutes = require('./routes/driver.routes');
+const bookingRoutes = require('./routes/booking.routes');
 
 const app = express();
 const server = http.createServer(app);
@@ -38,6 +39,16 @@ io.on('connection', (socket) => {
     // Broadcast to all connected clients except sender
     socket.broadcast.emit('driverStatusUpdate', data);
   });
+  
+  socket.on('newBooking', (data) => {
+    // Broadcast to all connected clients
+    io.emit('bookingCreated', data);
+  });
+  
+  socket.on('bookingResponse', (data) => {
+    // Broadcast to all connected clients
+    io.emit('bookingUpdated', data);
+  });
 
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
@@ -47,6 +58,7 @@ io.on('connection', (socket) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/drivers', driverRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 // Root route
 app.get('/', (req, res) => {
