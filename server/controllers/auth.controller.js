@@ -92,7 +92,7 @@ exports.employeeLogin = async (req, res) => {
 
 exports.driverSignup = async (req, res) => {
   try {
-    const { name, mobileNumber, rickshawNumber, location } = req.body;
+    const { name, mobileNumber, password, rickshawNumber, location } = req.body;
 
     // Check if driver already exists
     const existingDriver = await Driver.findOne({ mobileNumber });
@@ -104,6 +104,7 @@ exports.driverSignup = async (req, res) => {
     const driver = new Driver({
       name,
       mobileNumber,
+      password,
       isAvailable: false,
       rickshawNumber,
       location
@@ -135,11 +136,17 @@ exports.driverSignup = async (req, res) => {
 
 exports.driverLogin = async (req, res) => {
   try {
-    const { name, mobileNumber } = req.body;
+    const { mobileNumber, password } = req.body;
 
     // Check if driver exists
-    const driver = await Driver.findOne({ name, mobileNumber });
+    const driver = await Driver.findOne({ mobileNumber });
     if (!driver) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    // Check password
+    const isMatch = await driver.comparePassword(password);
+    if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 

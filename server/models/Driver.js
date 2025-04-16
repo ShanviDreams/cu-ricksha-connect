@@ -14,6 +14,10 @@ const driverSchema = new mongoose.Schema({
     unique: true,
     trim: true
   },
+  password: {
+    type: String,
+    required: true
+  },
   isAvailable: {
     type: Boolean,
     default: false
@@ -29,6 +33,24 @@ const driverSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+// Hash password before saving
+driverSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Method to compare password
+driverSchema.methods.comparePassword = async function(candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
+};
 
 const Driver = mongoose.model('Driver', driverSchema);
 

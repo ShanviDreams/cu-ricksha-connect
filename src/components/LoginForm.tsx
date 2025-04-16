@@ -13,19 +13,19 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   
-  // Teacher login state
+  // Employee login state
   const [employeeId, setEmployeeId] = useState('');
-  const [password, setPassword] = useState('');
+  const [employeePassword, setEmployeePassword] = useState('');
   
   // Driver login state
-  const [name, setName] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
+  const [driverPassword, setDriverPassword] = useState('');
   
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleTeacherLogin = async (e: React.FormEvent) => {
+  const handleEmployeeLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!employeeId || !password) {
+    if (!employeeId || !employeePassword) {
       toast.error('Please fill all the fields');
       return;
     }
@@ -34,8 +34,8 @@ const LoginForm = () => {
       setIsLoading(true);
       const response = await authAPI.login({
         employeeId,
-        password,
-        role: 'teacher'
+        password: employeePassword,
+        role: 'employee'
       });
       
       login(response.token, response.user);
@@ -51,7 +51,7 @@ const LoginForm = () => {
 
   const handleDriverLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !mobileNumber) {
+    if (!mobileNumber || !driverPassword) {
       toast.error('Please fill all the fields');
       return;
     }
@@ -59,8 +59,8 @@ const LoginForm = () => {
     try {
       setIsLoading(true);
       const response = await authAPI.login({
-        name,
         mobileNumber,
+        password: driverPassword,
         role: 'driver'
       });
       
@@ -84,7 +84,7 @@ const LoginForm = () => {
         </TabsList>
         
         <TabsContent value="teacher">
-          <form onSubmit={handleTeacherLogin} className="space-y-4 pt-4">
+          <form onSubmit={handleEmployeeLogin} className="space-y-4 pt-4">
             <div className="space-y-2">
               <Label htmlFor="employeeId">Employee ID</Label>
               <Input
@@ -102,8 +102,8 @@ const LoginForm = () => {
                 id="password"
                 type="password"
                 placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={employeePassword}
+                onChange={(e) => setEmployeePassword(e.target.value)}
               />
             </div>
             
@@ -120,17 +120,6 @@ const LoginForm = () => {
         <TabsContent value="driver">
           <form onSubmit={handleDriverLogin} className="space-y-4 pt-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="Enter your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            
-            <div className="space-y-2">
               <Label htmlFor="mobileNumber">Mobile Number</Label>
               <Input
                 id="mobileNumber"
@@ -138,6 +127,17 @@ const LoginForm = () => {
                 placeholder="Enter your mobile number"
                 value={mobileNumber}
                 onChange={(e) => setMobileNumber(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="driverPassword">Password</Label>
+              <Input
+                id="driverPassword"
+                type="password"
+                placeholder="Enter your password"
+                value={driverPassword}
+                onChange={(e) => setDriverPassword(e.target.value)}
               />
             </div>
             

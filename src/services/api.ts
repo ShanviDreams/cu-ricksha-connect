@@ -48,22 +48,20 @@ export const authAPI = {
   login: async (credentials: { 
     employeeId?: string; 
     password?: string; 
-    name?: string; 
     mobileNumber?: string;
-    role: 'teacher' | 'driver' 
+    role: 'teacher' | 'driver' | 'employee'
   }) => {
     if (isDev) {
       console.log('Using mock login for development');
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
       
-      if (credentials.role === 'teacher') {
+      if (credentials.role === 'teacher' || credentials.role === 'employee') {
         const teacher = mockUsers.teachers.find(t => t.employeeId === credentials.employeeId);
         if (teacher) {
           return { token: 'mock-token', user: teacher };
         }
       } else {
-        const driver = mockUsers.drivers.find(d => 
-          d.name === credentials.name && d.mobileNumber === credentials.mobileNumber);
+        const driver = mockUsers.drivers.find(d => d.mobileNumber === credentials.mobileNumber);
         if (driver) {
           return { token: 'mock-token', user: driver };
         }
@@ -71,7 +69,10 @@ export const authAPI = {
       throw new Error('Invalid credentials');
     }
 
-    const endpoint = credentials.role === 'teacher' ? '/auth/teacher/login' : '/auth/driver/login';
+    const endpoint = credentials.role === 'teacher' || credentials.role === 'employee' 
+      ? '/auth/employee/login' 
+      : '/auth/driver/login';
+      
     try {
       const response = await api.post(endpoint, credentials);
       return response.data;
@@ -86,13 +87,13 @@ export const authAPI = {
     employeeId?: string;
     password?: string;
     mobileNumber?: string;
-    role: 'teacher' | 'driver';
+    role: 'teacher' | 'driver' | 'employee';
   }) => {
     if (isDev) {
       console.log('Using mock signup for development');
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
       
-      if (userData.role === 'teacher') {
+      if (userData.role === 'teacher' || userData.role === 'employee') {
         const newTeacher = { 
           id: `teacher${Date.now()}`, 
           name: userData.name, 
@@ -114,7 +115,10 @@ export const authAPI = {
       }
     }
 
-    const endpoint = userData.role === 'teacher' ? '/auth/teacher/signup' : '/auth/driver/signup';
+    const endpoint = userData.role === 'teacher' || userData.role === 'employee'
+      ? '/auth/employee/signup' 
+      : '/auth/driver/signup';
+      
     try {
       const response = await api.post(endpoint, userData);
       return response.data;
@@ -125,12 +129,12 @@ export const authAPI = {
   },
 
   // New method for deleting account
-  deleteAccount: async (userId: string, role: 'teacher' | 'driver') => {
+  deleteAccount: async (userId: string, role: 'teacher' | 'driver' | 'employee') => {
     if (isDev) {
       console.log('Using mock account deletion for development');
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
       
-      if (role === 'teacher') {
+      if (role === 'teacher' || role === 'employee') {
         mockUsers.teachers = mockUsers.teachers.filter(t => t.id !== userId);
       } else {
         mockUsers.drivers = mockUsers.drivers.filter(d => d.id !== userId);
@@ -138,7 +142,7 @@ export const authAPI = {
       return { success: true, message: 'Account deleted successfully' };
     }
 
-    const endpoint = `/auth/${role}/delete-account`;
+    const endpoint = `/auth/${role === 'teacher' || role === 'employee' ? 'employee' : 'driver'}/delete-account`;
     try {
       const response = await api.delete(endpoint);
       return response.data;

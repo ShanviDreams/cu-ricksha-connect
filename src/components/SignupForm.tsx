@@ -20,6 +20,8 @@ const SignupForm = () => {
   // Driver signup state
   const [driverName, setDriverName] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
+  const [driverPassword, setDriverPassword] = useState('');
+  const [driverConfirmPassword, setDriverConfirmPassword] = useState('');
   
   const [isLoading, setIsLoading] = useState(false);
 
@@ -62,18 +64,29 @@ const SignupForm = () => {
 
   const handleDriverSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!driverName || !mobileNumber) {
+    if (!driverName || !mobileNumber || !driverPassword || !driverConfirmPassword) {
       toast.error('Please fill all fields');
+      return;
+    }
+
+    if (driverPassword !== driverConfirmPassword) {
+      toast.error('Passwords do not match');
       return;
     }
 
     try {
       setIsLoading(true);
-      console.log('Driver signup payload:', { name: driverName, mobileNumber, role: 'driver' });
+      console.log('Driver signup payload:', { 
+        name: driverName, 
+        mobileNumber, 
+        password: driverPassword, 
+        role: 'driver' 
+      });
       
       const response = await authAPI.signup({
         name: driverName,
         mobileNumber,
+        password: driverPassword,
         role: 'driver'
       });
       
@@ -175,6 +188,28 @@ const SignupForm = () => {
                 placeholder="Enter your mobile number"
                 value={mobileNumber}
                 onChange={(e) => setMobileNumber(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="driverPassword">Password</Label>
+              <Input
+                id="driverPassword"
+                type="password"
+                placeholder="Create a password"
+                value={driverPassword}
+                onChange={(e) => setDriverPassword(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="driverConfirmPassword">Confirm Password</Label>
+              <Input
+                id="driverConfirmPassword"
+                type="password"
+                placeholder="Confirm your password"
+                value={driverConfirmPassword}
+                onChange={(e) => setDriverConfirmPassword(e.target.value)}
               />
             </div>
             
