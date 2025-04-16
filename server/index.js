@@ -14,7 +14,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: '*',
-    methods: ['GET', 'POST', 'PUT']
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
 });
 
@@ -48,6 +48,11 @@ io.on('connection', (socket) => {
   socket.on('bookingResponse', (data) => {
     // Broadcast to all connected clients
     io.emit('bookingUpdated', data);
+  });
+
+  socket.on('accountDeleted', (data) => {
+    // Broadcast to all connected clients
+    io.emit('userRemoved', data);
   });
 
   socket.on('disconnect', () => {

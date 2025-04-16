@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import AvailabilityToggle from '@/components/AvailabilityToggle';
 import BookingsList from '@/components/BookingsList';
+import DeleteAccount from '@/components/DeleteAccount';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -87,6 +88,9 @@ const DriverDashboard = () => {
                         <li>View and respond to ride requests in the "Ride Requests" tab</li>
                       </ul>
                     </div>
+
+                    {/* Add Delete Account button section */}
+                    <DeleteAccount />
                   </CardContent>
                 </Card>
               </div>
