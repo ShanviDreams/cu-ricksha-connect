@@ -1,18 +1,19 @@
 
 {
-  "name": "cu-e-ricksha-backend",
+  "name": "cu-e-rickshaw-backend",
   "version": "1.0.0",
-  "description": "Backend API for CU E-Ricksha application",
-  "main": "index.js",
+  "description": "Backend API for CU E-Rickshaw application",
+  "main": "server.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "clear-db": "node scripts/clearDatabase.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "express",
     "mongodb",
-    "socket.io",
+    "mongoose",
     "jwt",
     "authentication"
   ],

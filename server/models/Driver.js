@@ -1,5 +1,6 @@
 
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const driverSchema = new mongoose.Schema({
   name: {
@@ -16,6 +17,14 @@ const driverSchema = new mongoose.Schema({
   isAvailable: {
     type: Boolean,
     default: false
+  },
+  rickshawNumber: {
+    type: String,
+    trim: true
+  },
+  location: {
+    type: String,
+    trim: true
   }
 }, {
   timestamps: true
