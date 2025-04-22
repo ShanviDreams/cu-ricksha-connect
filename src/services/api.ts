@@ -29,6 +29,21 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Add response interceptor for better error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('API Error:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    return Promise.reject(error);
+  }
+);
+
 // Authentication APIs
 export const authAPI = {
   login: async (credentials: { 
@@ -51,8 +66,10 @@ export const authAPI = {
       console.log('Login response:', response.data);
       
       // Store token in localStorage
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      if (response.data && response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      }
       
       return response.data;
     } catch (error) {
@@ -86,8 +103,13 @@ export const authAPI = {
       console.log('Signup response:', response.data);
       
       return response.data;
-    } catch (error) {
-      console.error('Signup API error:', error);
+    } catch (error: any) {
+      console.error('Signup API error:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        endpoint: error.config?.url
+      });
       throw error;
     }
   },

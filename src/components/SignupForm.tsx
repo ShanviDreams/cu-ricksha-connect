@@ -7,6 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { authAPI } from '@/services/api';
 import { toast } from 'sonner';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 const SignupForm = () => {
   const navigate = useNavigate();
@@ -28,16 +30,23 @@ const SignupForm = () => {
   const [location, setLocation] = useState('');
   
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const clearError = () => setErrorMsg('');
 
   const handleTeacherSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    clearError();
+    
     if (!teacherName || !employeeId || !password || !confirmPassword) {
       toast.error('Please fill all required fields');
+      setErrorMsg('Please fill all required fields');
       return;
     }
     
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
+      setErrorMsg('Passwords do not match');
       return;
     }
 
@@ -49,7 +58,7 @@ const SignupForm = () => {
         password: '[HIDDEN]', 
         department,
         position,
-        role: 'employee' 
+        role: 'teacher' 
       });
       
       const response = await authAPI.signup({
@@ -58,7 +67,7 @@ const SignupForm = () => {
         password,
         department,
         position,
-        role: 'employee'
+        role: 'teacher'
       });
       
       console.log('Signup successful:', response);
@@ -68,6 +77,7 @@ const SignupForm = () => {
       console.error('Signup error:', error);
       const errorMessage = error.response?.data?.message || 'Signup failed. Please try again.';
       toast.error(errorMessage);
+      setErrorMsg(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -75,13 +85,17 @@ const SignupForm = () => {
 
   const handleDriverSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    clearError();
+    
     if (!driverName || !mobileNumber || !driverPassword || !driverConfirmPassword) {
       toast.error('Please fill all required fields');
+      setErrorMsg('Please fill all required fields');
       return;
     }
 
     if (driverPassword !== driverConfirmPassword) {
       toast.error('Passwords do not match');
+      setErrorMsg('Passwords do not match');
       return;
     }
 
@@ -112,6 +126,7 @@ const SignupForm = () => {
       console.error('Signup error:', error);
       const errorMessage = error.response?.data?.message || 'Signup failed. Please try again.';
       toast.error(errorMessage);
+      setErrorMsg(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -119,10 +134,17 @@ const SignupForm = () => {
 
   return (
     <div className="w-full max-w-md mx-auto">
+      {errorMsg && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{errorMsg}</AlertDescription>
+        </Alert>
+      )}
+      
       <Tabs defaultValue="teacher" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="teacher">Teacher</TabsTrigger>
-          <TabsTrigger value="driver">Driver</TabsTrigger>
+          <TabsTrigger value="teacher" onClick={clearError}>Teacher</TabsTrigger>
+          <TabsTrigger value="driver" onClick={clearError}>Driver</TabsTrigger>
         </TabsList>
         
         <TabsContent value="teacher">
