@@ -19,7 +19,7 @@ const DeleteAccount = () => {
     
     try {
       setIsDeleting(true);
-      await authAPI.deleteAccount(user.id, user.role);
+      await authAPI.deleteAccount(user.role);
       toast.success("Your account has been deleted successfully");
       logout();
       navigate("/");

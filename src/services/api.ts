@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 
 // Use environment variable if available, otherwise use the production URL
@@ -91,8 +92,8 @@ export const authAPI = {
     }
   },
 
-  // Delete account method
-  deleteAccount: async (role: 'teacher' | 'driver' | 'employee') => {
+  // Delete account method - modified to take only role parameter
+  deleteAccount: async (role: string) => {
     try {
       const endpoint = `/auth/${role === 'teacher' || role === 'employee' ? 'employee' : 'driver'}/delete-account`;
       
