@@ -32,18 +32,22 @@ const LoginForm = () => {
 
     try {
       setIsLoading(true);
+      console.log('Attempting employee login with:', { employeeId, password: employeePassword });
+      
       const response = await authAPI.login({
         employeeId,
         password: employeePassword,
         role: 'employee'
       });
       
+      console.log('Login response:', response);
       login(response.token, response.user);
       toast.success('Login successful!');
       navigate('/teacher-dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
-      toast.error('Invalid credentials. Please try again.');
+      const errorMessage = error.response?.data?.message || 'Invalid credentials. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -58,18 +62,22 @@ const LoginForm = () => {
 
     try {
       setIsLoading(true);
+      console.log('Attempting driver login with:', { mobileNumber, password: driverPassword });
+      
       const response = await authAPI.login({
         mobileNumber,
         password: driverPassword,
         role: 'driver'
       });
       
+      console.log('Login response:', response);
       login(response.token, response.user);
       toast.success('Login successful!');
       navigate('/driver-dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
-      toast.error('Invalid credentials. Please try again.');
+      const errorMessage = error.response?.data?.message || 'Invalid credentials. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

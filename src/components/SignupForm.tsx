@@ -16,19 +16,23 @@ const SignupForm = () => {
   const [employeeId, setEmployeeId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [department, setDepartment] = useState('');
+  const [position, setPosition] = useState('');
   
   // Driver signup state
   const [driverName, setDriverName] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [driverPassword, setDriverPassword] = useState('');
   const [driverConfirmPassword, setDriverConfirmPassword] = useState('');
+  const [rickshawNumber, setRickshawNumber] = useState('');
+  const [location, setLocation] = useState('');
   
   const [isLoading, setIsLoading] = useState(false);
 
   const handleTeacherSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!teacherName || !employeeId || !password || !confirmPassword) {
-      toast.error('Please fill all fields');
+      toast.error('Please fill all required fields');
       return;
     }
     
@@ -39,14 +43,22 @@ const SignupForm = () => {
 
     try {
       setIsLoading(true);
-      console.log('Teacher signup payload:', { name: teacherName, employeeId, password, role: 'teacher' });
+      console.log('Teacher signup payload:', { 
+        name: teacherName, 
+        employeeId, 
+        password: '[HIDDEN]', 
+        department,
+        position,
+        role: 'employee' 
+      });
       
-      // Use the local API for testing if in development environment
       const response = await authAPI.signup({
         name: teacherName,
         employeeId,
         password,
-        role: 'teacher'
+        department,
+        position,
+        role: 'employee'
       });
       
       console.log('Signup successful:', response);
@@ -54,7 +66,6 @@ const SignupForm = () => {
       navigate('/login');
     } catch (error: any) {
       console.error('Signup error:', error);
-      // Show more specific error message if available from the API response
       const errorMessage = error.response?.data?.message || 'Signup failed. Please try again.';
       toast.error(errorMessage);
     } finally {
@@ -65,7 +76,7 @@ const SignupForm = () => {
   const handleDriverSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!driverName || !mobileNumber || !driverPassword || !driverConfirmPassword) {
-      toast.error('Please fill all fields');
+      toast.error('Please fill all required fields');
       return;
     }
 
@@ -79,7 +90,9 @@ const SignupForm = () => {
       console.log('Driver signup payload:', { 
         name: driverName, 
         mobileNumber, 
-        password: driverPassword, 
+        password: '[HIDDEN]',
+        rickshawNumber,
+        location, 
         role: 'driver' 
       });
       
@@ -87,6 +100,8 @@ const SignupForm = () => {
         name: driverName,
         mobileNumber,
         password: driverPassword,
+        rickshawNumber,
+        location,
         role: 'driver'
       });
       
@@ -95,7 +110,6 @@ const SignupForm = () => {
       navigate('/login');
     } catch (error: any) {
       console.error('Signup error:', error);
-      // Show more specific error message if available from the API response
       const errorMessage = error.response?.data?.message || 'Signup failed. Please try again.';
       toast.error(errorMessage);
     } finally {
@@ -114,48 +128,76 @@ const SignupForm = () => {
         <TabsContent value="teacher">
           <form onSubmit={handleTeacherSignup} className="space-y-4 pt-4">
             <div className="space-y-2">
-              <Label htmlFor="teacherName">Full Name</Label>
+              <Label htmlFor="teacherName">Full Name*</Label>
               <Input
                 id="teacherName"
                 type="text"
                 placeholder="Enter your full name"
                 value={teacherName}
                 onChange={(e) => setTeacherName(e.target.value)}
+                required
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="employeeId">Employee ID</Label>
+              <Label htmlFor="employeeId">Employee ID*</Label>
               <Input
                 id="employeeId"
                 type="text"
                 placeholder="Enter your Employee ID"
                 value={employeeId}
                 onChange={(e) => setEmployeeId(e.target.value)}
+                required
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="department">Department</Label>
+              <Input
+                id="department"
+                type="text"
+                placeholder="Enter your department"
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="position">Position</Label>
+              <Input
+                id="position"
+                type="text"
+                placeholder="Enter your position"
+                value={position}
+                onChange={(e) => setPosition(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Password*</Label>
               <Input
                 id="password"
                 type="password"
                 placeholder="Create a password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">Confirm Password*</Label>
               <Input
                 id="confirmPassword"
                 type="password"
                 placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                required
               />
             </div>
+            
+            <div className="text-xs text-gray-500">Fields marked with * are required</div>
             
             <Button 
               type="submit" 
@@ -170,48 +212,76 @@ const SignupForm = () => {
         <TabsContent value="driver">
           <form onSubmit={handleDriverSignup} className="space-y-4 pt-4">
             <div className="space-y-2">
-              <Label htmlFor="driverName">Full Name</Label>
+              <Label htmlFor="driverName">Full Name*</Label>
               <Input
                 id="driverName"
                 type="text"
                 placeholder="Enter your full name"
                 value={driverName}
                 onChange={(e) => setDriverName(e.target.value)}
+                required
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="mobileNumber">Mobile Number</Label>
+              <Label htmlFor="mobileNumber">Mobile Number*</Label>
               <Input
                 id="mobileNumber"
                 type="tel"
                 placeholder="Enter your mobile number"
                 value={mobileNumber}
                 onChange={(e) => setMobileNumber(e.target.value)}
+                required
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="driverPassword">Password</Label>
+              <Label htmlFor="rickshawNumber">Rickshaw Number</Label>
+              <Input
+                id="rickshawNumber"
+                type="text"
+                placeholder="Enter your rickshaw number"
+                value={rickshawNumber}
+                onChange={(e) => setRickshawNumber(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
+                type="text"
+                placeholder="Enter your location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="driverPassword">Password*</Label>
               <Input
                 id="driverPassword"
                 type="password"
                 placeholder="Create a password"
                 value={driverPassword}
                 onChange={(e) => setDriverPassword(e.target.value)}
+                required
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="driverConfirmPassword">Confirm Password</Label>
+              <Label htmlFor="driverConfirmPassword">Confirm Password*</Label>
               <Input
                 id="driverConfirmPassword"
                 type="password"
                 placeholder="Confirm your password"
                 value={driverConfirmPassword}
                 onChange={(e) => setDriverConfirmPassword(e.target.value)}
+                required
               />
             </div>
+            
+            <div className="text-xs text-gray-500">Fields marked with * are required</div>
             
             <Button 
               type="submit" 

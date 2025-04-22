@@ -38,21 +38,25 @@ io.on('connection', (socket) => {
   socket.on('driverStatusChange', (data) => {
     // Broadcast to all connected clients except sender
     socket.broadcast.emit('driverStatusUpdate', data);
+    console.log('Driver status change:', data);
   });
   
   socket.on('newBooking', (data) => {
     // Broadcast to all connected clients
     io.emit('bookingCreated', data);
+    console.log('New booking created:', data);
   });
   
   socket.on('bookingResponse', (data) => {
     // Broadcast to all connected clients
     io.emit('bookingUpdated', data);
+    console.log('Booking response:', data);
   });
 
   socket.on('accountDeleted', (data) => {
     // Broadcast to all connected clients
     io.emit('userRemoved', data);
+    console.log('Account deleted:', data);
   });
 
   socket.on('disconnect', () => {
@@ -73,7 +77,7 @@ app.get('/', (req, res) => {
 // Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send({ message: 'Something went wrong!' });
+  res.status(500).send({ message: 'Something went wrong!', error: err.message });
 });
 
 // Start server

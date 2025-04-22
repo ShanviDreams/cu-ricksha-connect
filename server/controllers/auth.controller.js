@@ -1,4 +1,3 @@
-
 const Employee = require('../models/Employee');
 const Driver = require('../models/Driver');
 const jwt = require('jsonwebtoken');
@@ -7,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const generateToken = (user, role) => {
   return jwt.sign(
     { id: user.id, role },
-    process.env.JWT_SECRET,
+    process.env.JWT_SECRET || 'your-secret-key-here',
     { expiresIn: '30d' }
   );
 };
@@ -27,8 +26,8 @@ exports.employeeSignup = async (req, res) => {
       name,
       employeeId,
       password,
-      department,
-      position
+      department: department || '',
+      position: position || ''
     });
 
     // Save employee to database
@@ -50,7 +49,7 @@ exports.employeeSignup = async (req, res) => {
     });
   } catch (error) {
     console.error('Employee signup error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -86,7 +85,7 @@ exports.employeeLogin = async (req, res) => {
     });
   } catch (error) {
     console.error('Employee login error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -106,8 +105,8 @@ exports.driverSignup = async (req, res) => {
       mobileNumber,
       password,
       isAvailable: false,
-      rickshawNumber,
-      location
+      rickshawNumber: rickshawNumber || '',
+      location: location || ''
     });
 
     // Save driver to database
@@ -130,7 +129,7 @@ exports.driverSignup = async (req, res) => {
     });
   } catch (error) {
     console.error('Driver signup error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -167,7 +166,7 @@ exports.driverLogin = async (req, res) => {
     });
   } catch (error) {
     console.error('Driver login error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -217,7 +216,6 @@ exports.getCurrentUser = async (req, res) => {
   }
 };
 
-// Add delete account functions
 exports.deleteEmployeeAccount = async (req, res) => {
   try {
     const { id } = req.user;
