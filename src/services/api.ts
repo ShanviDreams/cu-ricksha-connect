@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 // Use environment variable if available, otherwise use the production URL
@@ -90,6 +89,7 @@ export const authAPI = {
     location?: string;
   }) => {
     try {
+      // Determine the correct endpoint based on the role
       const endpoint = userData.role === 'teacher' || userData.role === 'employee'
         ? '/auth/employee/signup' 
         : '/auth/driver/signup';
@@ -100,24 +100,28 @@ export const authAPI = {
         password: userData.password ? '[HIDDEN]' : undefined 
       });
       
-      // Make sure we're sending the right data format
-      const requestData = userData.role === 'teacher' || userData.role === 'employee'
-        ? {
-            name: userData.name,
-            employeeId: userData.employeeId,
-            password: userData.password,
-            department: userData.department || '',
-            position: userData.position || '',
-            role: userData.role
-          }
-        : {
-            name: userData.name,
-            mobileNumber: userData.mobileNumber,
-            password: userData.password,
-            rickshawNumber: userData.rickshawNumber || '',
-            location: userData.location || '',
-            role: userData.role
-          };
+      // Prepare the request data based on the role
+      let requestData;
+      
+      if (userData.role === 'teacher' || userData.role === 'employee') {
+        requestData = {
+          name: userData.name,
+          employeeId: userData.employeeId,
+          password: userData.password,
+          department: userData.department || '',
+          position: userData.position || ''
+        };
+      } else {
+        requestData = {
+          name: userData.name,
+          mobileNumber: userData.mobileNumber,
+          password: userData.password,
+          rickshawNumber: userData.rickshawNumber || '',
+          location: userData.location || ''
+        };
+      }
+      
+      console.log('Final request data:', { ...requestData, password: requestData.password ? '[HIDDEN]' : undefined });
       
       const response = await api.post(endpoint, requestData);
       console.log('Signup response:', response.data);

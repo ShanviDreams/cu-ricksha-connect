@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import SignupForm from '@/components/SignupForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
+import { Toaster } from 'sonner';
 
 const Signup = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -24,7 +25,14 @@ const Signup = () => {
     img.src = "https://scontent.fluh1-2.fna.fbcdn.net/v/t1.6435-9/191230189_3739112682862090_9220374159950932563_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=XuDkxuQ3hGEQ7kNvwHZ_ieU&_nc_oc=AdlWCuRDPPz3vcpT8ae6I4OSrri8so7JlD-h6mnITmuTTTvXxT2tfuLyQ7HikNJr1qQ&_nc_zt=23&_nc_ht=scontent.fluh1-2.fna&_nc_gid=xZDRu3PGtiyZUihu8NiHow&oh=00_AfEANS6Day2wxrBTNFAimrx_SPF3g1q9IdMey6ajR8EiKw&oe=68232DC7";
     img.onload = handleImageLoad;
     img.onerror = handleImageError;
-  }, []);
+    
+    // Fallback if image takes too long
+    const timeout = setTimeout(() => {
+      if (isLoading) setIsLoading(false);
+    }, 3000);
+    
+    return () => clearTimeout(timeout);
+  }, [isLoading]);
 
   return (
     <div 
@@ -60,6 +68,9 @@ const Signup = () => {
           </div>
         </CardContent>
       </Card>
+      
+      {/* Add Toaster for notifications */}
+      <Toaster position="top-center" richColors />
     </div>
   );
 };

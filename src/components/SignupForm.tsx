@@ -73,7 +73,7 @@ const SignupForm = () => {
         password: '[HIDDEN]', 
         department,
         position,
-        role: 'teacher' 
+        role: 'employee' // Changed from 'teacher' to match backend expectations
       });
       
       const response = await authAPI.signup({
@@ -82,7 +82,7 @@ const SignupForm = () => {
         password,
         department,
         position,
-        role: 'teacher'
+        role: 'employee' // Changed from 'teacher' to match backend expectations
       });
       
       console.log('Signup successful:', response);
