@@ -29,13 +29,18 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Mock data for development/testing - removing test and busy driver
+// Mock data for development/testing
 const mockUsers = {
   teachers: [
     { id: 'teacher1', name: 'Test Teacher', employeeId: 'T12345', role: 'teacher' }
   ],
-  drivers: [],
-  messages: []
+  drivers: [
+    { id: 'driver1', name: 'Test Driver', mobileNumber: '1234567890', isAvailable: true, role: 'driver' },
+    { id: 'driver2', name: 'Busy Driver', mobileNumber: '0987654321', isAvailable: false, role: 'driver' }
+  ],
+  messages: [
+    { id: 'msg1', from: 'teacher1', to: 'driver1', text: 'Can you pick me up from Science Block at 2pm?', status: 'pending', timestamp: new Date().toISOString() }
+  ]
 };
 
 // Authentication APIs
@@ -53,23 +58,11 @@ export const authAPI = {
       if (credentials.role === 'teacher' || credentials.role === 'employee') {
         const teacher = mockUsers.teachers.find(t => t.employeeId === credentials.employeeId);
         if (teacher) {
-          // Store credentials in localStorage for development
-          localStorage.setItem('dev_credentials', JSON.stringify({
-            type: 'teacher',
-            employeeId: credentials.employeeId,
-            password: credentials.password
-          }));
           return { token: 'mock-token', user: teacher };
         }
       } else {
         const driver = mockUsers.drivers.find(d => d.mobileNumber === credentials.mobileNumber);
         if (driver) {
-          // Store credentials in localStorage for development
-          localStorage.setItem('dev_credentials', JSON.stringify({
-            type: 'driver',
-            mobileNumber: credentials.mobileNumber,
-            password: credentials.password
-          }));
           return { token: 'mock-token', user: driver };
         }
       }
@@ -81,9 +74,7 @@ export const authAPI = {
       : '/auth/driver/login';
       
     try {
-      console.log('Sending login request to:', endpoint, credentials);
       const response = await api.post(endpoint, credentials);
-      console.log('Login response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Login API error:', error);
@@ -110,14 +101,6 @@ export const authAPI = {
           role: 'teacher' 
         };
         mockUsers.teachers.push(newTeacher);
-        
-        // Store credentials in localStorage for development
-        localStorage.setItem('dev_credentials', JSON.stringify({
-          type: 'teacher',
-          employeeId: userData.employeeId,
-          password: userData.password
-        }));
-        
         return { token: 'mock-token', user: newTeacher };
       } else {
         const newDriver = { 
@@ -128,14 +111,6 @@ export const authAPI = {
           role: 'driver' 
         };
         mockUsers.drivers.push(newDriver);
-        
-        // Store credentials in localStorage for development
-        localStorage.setItem('dev_credentials', JSON.stringify({
-          type: 'driver',
-          mobileNumber: userData.mobileNumber,
-          password: userData.password
-        }));
-        
         return { token: 'mock-token', user: newDriver };
       }
     }
@@ -145,9 +120,7 @@ export const authAPI = {
       : '/auth/driver/signup';
       
     try {
-      console.log('Sending signup request to:', endpoint, userData);
       const response = await api.post(endpoint, userData);
-      console.log('Signup response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Signup API error:', error);
@@ -155,7 +128,7 @@ export const authAPI = {
     }
   },
 
-  // Delete account method
+  // New method for deleting account
   deleteAccount: async (userId: string, role: 'teacher' | 'driver' | 'employee') => {
     if (isDev) {
       console.log('Using mock account deletion for development');
@@ -163,21 +136,15 @@ export const authAPI = {
       
       if (role === 'teacher' || role === 'employee') {
         mockUsers.teachers = mockUsers.teachers.filter(t => t.id !== userId);
-        // Clear stored credentials
-        localStorage.removeItem('dev_credentials');
       } else {
         mockUsers.drivers = mockUsers.drivers.filter(d => d.id !== userId);
-        // Clear stored credentials
-        localStorage.removeItem('dev_credentials');
       }
       return { success: true, message: 'Account deleted successfully' };
     }
 
     const endpoint = `/auth/${role === 'teacher' || role === 'employee' ? 'employee' : 'driver'}/delete-account`;
     try {
-      console.log('Sending delete account request to:', endpoint);
       const response = await api.delete(endpoint);
-      console.log('Delete account response:', response.data);
       return response.data;
     } catch (error) {
       console.error('Account deletion API error:', error);
