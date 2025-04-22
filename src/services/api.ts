@@ -94,12 +94,32 @@ export const authAPI = {
         ? '/auth/employee/signup' 
         : '/auth/driver/signup';
         
+      // Log request details for debugging
       console.log('Sending signup request to:', endpoint, 'with data:', { 
         ...userData, 
         password: userData.password ? '[HIDDEN]' : undefined 
       });
       
-      const response = await api.post(endpoint, userData);
+      // Make sure we're sending the right data format
+      const requestData = userData.role === 'teacher' || userData.role === 'employee'
+        ? {
+            name: userData.name,
+            employeeId: userData.employeeId,
+            password: userData.password,
+            department: userData.department || '',
+            position: userData.position || '',
+            role: userData.role
+          }
+        : {
+            name: userData.name,
+            mobileNumber: userData.mobileNumber,
+            password: userData.password,
+            rickshawNumber: userData.rickshawNumber || '',
+            location: userData.location || '',
+            role: userData.role
+          };
+      
+      const response = await api.post(endpoint, requestData);
       console.log('Signup response:', response.data);
       
       return response.data;
@@ -114,7 +134,7 @@ export const authAPI = {
     }
   },
 
-  // Delete account method - modified to take only role parameter
+  // Delete account method - takes only role parameter
   deleteAccount: async (role: string) => {
     try {
       const endpoint = `/auth/${role === 'teacher' || role === 'employee' ? 'employee' : 'driver'}/delete-account`;

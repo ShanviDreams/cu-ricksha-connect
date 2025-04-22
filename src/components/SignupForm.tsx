@@ -31,8 +31,16 @@ const SignupForm = () => {
   
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [activeTab, setActiveTab] = useState('teacher');
 
   const clearError = () => setErrorMsg('');
+
+  const validatePasswordStrength = (pwd: string) => {
+    if (pwd.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+    return null;
+  };
 
   const handleTeacherSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +55,13 @@ const SignupForm = () => {
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
       setErrorMsg('Passwords do not match');
+      return;
+    }
+
+    const passwordError = validatePasswordStrength(password);
+    if (passwordError) {
+      toast.error(passwordError);
+      setErrorMsg(passwordError);
       return;
     }
 
@@ -99,6 +114,13 @@ const SignupForm = () => {
       return;
     }
 
+    const passwordError = validatePasswordStrength(driverPassword);
+    if (passwordError) {
+      toast.error(passwordError);
+      setErrorMsg(passwordError);
+      return;
+    }
+
     try {
       setIsLoading(true);
       console.log('Driver signup payload:', { 
@@ -132,6 +154,11 @@ const SignupForm = () => {
     }
   };
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    clearError();
+  };
+
   return (
     <div className="w-full max-w-md mx-auto">
       {errorMsg && (
@@ -141,10 +168,10 @@ const SignupForm = () => {
         </Alert>
       )}
       
-      <Tabs defaultValue="teacher" className="w-full">
+      <Tabs defaultValue="teacher" value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="teacher" onClick={clearError}>Teacher</TabsTrigger>
-          <TabsTrigger value="driver" onClick={clearError}>Driver</TabsTrigger>
+          <TabsTrigger value="teacher">Teacher</TabsTrigger>
+          <TabsTrigger value="driver">Driver</TabsTrigger>
         </TabsList>
         
         <TabsContent value="teacher">
@@ -158,6 +185,7 @@ const SignupForm = () => {
                 value={teacherName}
                 onChange={(e) => setTeacherName(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -170,6 +198,7 @@ const SignupForm = () => {
                 value={employeeId}
                 onChange={(e) => setEmployeeId(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -181,6 +210,7 @@ const SignupForm = () => {
                 placeholder="Enter your department"
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             
@@ -192,6 +222,7 @@ const SignupForm = () => {
                 placeholder="Enter your position"
                 value={position}
                 onChange={(e) => setPosition(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             
@@ -200,10 +231,11 @@ const SignupForm = () => {
               <Input
                 id="password"
                 type="password"
-                placeholder="Create a password"
+                placeholder="Create a password (min 6 characters)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -216,6 +248,7 @@ const SignupForm = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -242,6 +275,7 @@ const SignupForm = () => {
                 value={driverName}
                 onChange={(e) => setDriverName(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -254,6 +288,7 @@ const SignupForm = () => {
                 value={mobileNumber}
                 onChange={(e) => setMobileNumber(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -265,6 +300,7 @@ const SignupForm = () => {
                 placeholder="Enter your rickshaw number"
                 value={rickshawNumber}
                 onChange={(e) => setRickshawNumber(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             
@@ -276,6 +312,7 @@ const SignupForm = () => {
                 placeholder="Enter your location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             
@@ -284,10 +321,11 @@ const SignupForm = () => {
               <Input
                 id="driverPassword"
                 type="password"
-                placeholder="Create a password"
+                placeholder="Create a password (min 6 characters)"
                 value={driverPassword}
                 onChange={(e) => setDriverPassword(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -300,6 +338,7 @@ const SignupForm = () => {
                 value={driverConfirmPassword}
                 onChange={(e) => setDriverConfirmPassword(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
             

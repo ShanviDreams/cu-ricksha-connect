@@ -26,12 +26,14 @@ exports.employeeSignup = async (req, res) => {
 
     // Validate required fields
     if (!name || !employeeId || !password) {
+      console.error('Missing required fields for employee signup');
       return res.status(400).json({ message: 'Name, Employee ID, and password are required' });
     }
 
     // Check if employee already exists
     const existingEmployee = await Employee.findOne({ employeeId });
     if (existingEmployee) {
+      console.log('Employee ID already exists:', employeeId);
       return res.status(400).json({ message: 'Employee ID already exists' });
     }
 
@@ -64,7 +66,7 @@ exports.employeeSignup = async (req, res) => {
     });
   } catch (error) {
     console.error('Employee signup error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error during signup', error: error.message });
   }
 };
 
@@ -85,12 +87,14 @@ exports.employeeLogin = async (req, res) => {
     // Check if employee exists
     const employee = await Employee.findOne({ employeeId });
     if (!employee) {
+      console.log('Employee not found:', employeeId);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     // Check password
     const isMatch = await employee.comparePassword(password);
     if (!isMatch) {
+      console.log('Invalid password for employee:', employeeId);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
@@ -112,7 +116,7 @@ exports.employeeLogin = async (req, res) => {
     });
   } catch (error) {
     console.error('Employee login error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error during login', error: error.message });
   }
 };
 
@@ -130,12 +134,14 @@ exports.driverSignup = async (req, res) => {
 
     // Validate required fields
     if (!name || !mobileNumber || !password) {
+      console.error('Missing required fields for driver signup');
       return res.status(400).json({ message: 'Name, mobile number, and password are required' });
     }
 
     // Check if driver already exists
     const existingDriver = await Driver.findOne({ mobileNumber });
     if (existingDriver) {
+      console.log('Mobile number already exists:', mobileNumber);
       return res.status(400).json({ message: 'Mobile number already exists' });
     }
 
@@ -170,7 +176,7 @@ exports.driverSignup = async (req, res) => {
     });
   } catch (error) {
     console.error('Driver signup error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error during signup', error: error.message });
   }
 };
 
@@ -191,12 +197,14 @@ exports.driverLogin = async (req, res) => {
     // Check if driver exists
     const driver = await Driver.findOne({ mobileNumber });
     if (!driver) {
+      console.log('Driver not found:', mobileNumber);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     // Check password
     const isMatch = await driver.comparePassword(password);
     if (!isMatch) {
+      console.log('Invalid password for driver:', mobileNumber);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
@@ -219,7 +227,7 @@ exports.driverLogin = async (req, res) => {
     });
   } catch (error) {
     console.error('Driver login error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error during login', error: error.message });
   }
 };
 

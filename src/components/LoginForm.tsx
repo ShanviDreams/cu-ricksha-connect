@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/context/AuthContext';
 import { authAPI } from '@/services/api';
 import { toast } from 'sonner';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -22,17 +24,29 @@ const LoginForm = () => {
   const [driverPassword, setDriverPassword] = useState('');
   
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [activeTab, setActiveTab] = useState('teacher');
+
+  const clearError = () => setErrorMsg('');
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    clearError();
+  };
 
   const handleEmployeeLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    clearError();
+    
     if (!employeeId || !employeePassword) {
       toast.error('Please fill all the fields');
+      setErrorMsg('Please fill all the fields');
       return;
     }
 
     try {
       setIsLoading(true);
-      console.log('Attempting employee login with:', { employeeId, password: employeePassword });
+      console.log('Attempting employee login with:', { employeeId, password: '[HIDDEN]' });
       
       const response = await authAPI.login({
         employeeId,
@@ -48,6 +62,7 @@ const LoginForm = () => {
       console.error('Login error:', error);
       const errorMessage = error.response?.data?.message || 'Invalid credentials. Please try again.';
       toast.error(errorMessage);
+      setErrorMsg(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -55,14 +70,17 @@ const LoginForm = () => {
 
   const handleDriverLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    clearError();
+    
     if (!mobileNumber || !driverPassword) {
       toast.error('Please fill all the fields');
+      setErrorMsg('Please fill all the fields');
       return;
     }
 
     try {
       setIsLoading(true);
-      console.log('Attempting driver login with:', { mobileNumber, password: driverPassword });
+      console.log('Attempting driver login with:', { mobileNumber, password: '[HIDDEN]' });
       
       const response = await authAPI.login({
         mobileNumber,
@@ -78,6 +96,7 @@ const LoginForm = () => {
       console.error('Login error:', error);
       const errorMessage = error.response?.data?.message || 'Invalid credentials. Please try again.';
       toast.error(errorMessage);
+      setErrorMsg(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +104,14 @@ const LoginForm = () => {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <Tabs defaultValue="teacher" className="w-full">
+      {errorMsg && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{errorMsg}</AlertDescription>
+        </Alert>
+      )}
+
+      <Tabs defaultValue="teacher" value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="teacher">Teacher</TabsTrigger>
           <TabsTrigger value="driver">Driver</TabsTrigger>
@@ -101,6 +127,8 @@ const LoginForm = () => {
                 placeholder="Enter your Employee ID"
                 value={employeeId}
                 onChange={(e) => setEmployeeId(e.target.value)}
+                disabled={isLoading}
+                required
               />
             </div>
             
@@ -112,6 +140,8 @@ const LoginForm = () => {
                 placeholder="Enter your password"
                 value={employeePassword}
                 onChange={(e) => setEmployeePassword(e.target.value)}
+                disabled={isLoading}
+                required
               />
             </div>
             
@@ -135,6 +165,8 @@ const LoginForm = () => {
                 placeholder="Enter your mobile number"
                 value={mobileNumber}
                 onChange={(e) => setMobileNumber(e.target.value)}
+                disabled={isLoading}
+                required
               />
             </div>
             
@@ -146,6 +178,8 @@ const LoginForm = () => {
                 placeholder="Enter your password"
                 value={driverPassword}
                 onChange={(e) => setDriverPassword(e.target.value)}
+                disabled={isLoading}
+                required
               />
             </div>
             
