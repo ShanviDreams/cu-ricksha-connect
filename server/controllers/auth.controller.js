@@ -1,4 +1,3 @@
-
 const Employee = require('../models/Employee');
 const Driver = require('../models/Driver');
 const jwt = require('jsonwebtoken');
@@ -65,7 +64,14 @@ exports.employeeSignup = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Employee signup error:', error);
+    console.error('Employee signup error:', error.message, error.stack);
+    
+    // Check for common MongoDB validation errors
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ message: 'Validation error', errors: messages });
+    }
+    
     res.status(500).json({ message: 'Server error during signup', error: error.message });
   }
 };
@@ -175,7 +181,14 @@ exports.driverSignup = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Driver signup error:', error);
+    console.error('Driver signup error:', error.message, error.stack);
+    
+    // Check for common MongoDB validation errors
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ message: 'Validation error', errors: messages });
+    }
+    
     res.status(500).json({ message: 'Server error during signup', error: error.message });
   }
 };

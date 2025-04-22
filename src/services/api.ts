@@ -13,7 +13,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
   // Add a longer timeout for Render's free tier cold starts
-  timeout: 30000,
+  timeout: 60000, // Increase timeout to 60 seconds for slow connections
 });
 
 // Add request interceptor to add auth token
@@ -23,6 +23,9 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    // Log outgoing requests for debugging
+    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`, 
+      config.data ? { ...config.data, password: config.data.password ? '[HIDDEN]' : undefined } : '');
     return config;
   },
   (error) => Promise.reject(error)
@@ -30,14 +33,18 @@ api.interceptors.request.use(
 
 // Add response interceptor for better error handling
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(`API Response: ${response.status} from ${response.config.url}`, response.data);
+    return response;
+  },
   (error) => {
-    console.error('API Error:', {
+    console.error('API Error Details:', {
       url: error.config?.url,
       method: error.config?.method,
       status: error.response?.status,
       data: error.response?.data,
-      message: error.message
+      message: error.message,
+      stack: isDev ? error.stack : undefined
     });
     return Promise.reject(error);
   }
@@ -52,7 +59,10 @@ export const authAPI = {
     role: 'teacher' | 'driver' | 'employee'
   }) => {
     try {
-      const endpoint = credentials.role === 'teacher' || credentials.role === 'employee' 
+      // Convert 'teacher' role to 'employee' for API consistency
+      const apiRole = credentials.role === 'teacher' ? 'employee' : credentials.role;
+      
+      const endpoint = apiRole === 'employee' 
         ? '/auth/employee/login' 
         : '/auth/driver/login';
         
@@ -61,13 +71,24 @@ export const authAPI = {
         password: credentials.password ? '[HIDDEN]' : undefined 
       });
       
-      const response = await api.post(endpoint, credentials);
-      console.log('Login response:', response.data);
+      const response = await api.post(endpoint, {
+        employeeId: credentials.employeeId,
+        mobileNumber: credentials.mobileNumber,
+        password: credentials.password
+      });
+      
+      console.log('Login response:', {
+        success: true,
+        token: response.data.token ? '[PRESENT]' : '[MISSING]',
+        user: response.data.user
+      });
       
       // Store token in localStorage
       if (response.data && response.data.token) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
+      } else {
+        throw new Error('No token received from server');
       }
       
       return response.data;
@@ -89,21 +110,21 @@ export const authAPI = {
     location?: string;
   }) => {
     try {
+      // Convert 'teacher' role to 'employee' for API consistency
+      const apiRole = userData.role === 'teacher' ? 'employee' : userData.role;
+      
       // Determine the correct endpoint based on the role
-      const endpoint = userData.role === 'teacher' || userData.role === 'employee'
+      const endpoint = apiRole === 'employee' 
         ? '/auth/employee/signup' 
         : '/auth/driver/signup';
         
       // Log request details for debugging
-      console.log('Sending signup request to:', endpoint, 'with data:', { 
-        ...userData, 
-        password: userData.password ? '[HIDDEN]' : undefined 
-      });
+      console.log('Sending signup request to:', endpoint);
       
-      // Prepare the request data based on the role
+      // Create a clean request object with only the fields needed by the API
       let requestData;
       
-      if (userData.role === 'teacher' || userData.role === 'employee') {
+      if (apiRole === 'employee') {
         requestData = {
           name: userData.name,
           employeeId: userData.employeeId,
@@ -121,10 +142,17 @@ export const authAPI = {
         };
       }
       
-      console.log('Final request data:', { ...requestData, password: requestData.password ? '[HIDDEN]' : undefined });
+      console.log('Final request data:', { 
+        ...requestData, 
+        password: requestData.password ? '[HIDDEN]' : undefined 
+      });
       
       const response = await api.post(endpoint, requestData);
-      console.log('Signup response:', response.data);
+      console.log('Signup response:', {
+        success: true,
+        token: response.data.token ? '[PRESENT]' : '[MISSING]',
+        user: response.data.user
+      });
       
       return response.data;
     } catch (error: any) {
@@ -137,8 +165,7 @@ export const authAPI = {
       throw error;
     }
   },
-
-  // Delete account method - takes only role parameter
+  
   deleteAccount: async (role: string) => {
     try {
       const endpoint = `/auth/${role === 'teacher' || role === 'employee' ? 'employee' : 'driver'}/delete-account`;
@@ -158,7 +185,6 @@ export const authAPI = {
     }
   },
   
-  // Get current user
   getCurrentUser: async () => {
     try {
       const response = await api.get('/auth/me');

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -73,7 +72,7 @@ const SignupForm = () => {
         password: '[HIDDEN]', 
         department,
         position,
-        role: 'employee' // Changed from 'teacher' to match backend expectations
+        role: 'employee' // This matches backend expectations
       });
       
       const response = await authAPI.signup({
@@ -82,14 +81,14 @@ const SignupForm = () => {
         password,
         department,
         position,
-        role: 'employee' // Changed from 'teacher' to match backend expectations
+        role: 'employee' // This matches backend expectations
       });
       
       console.log('Signup successful:', response);
       toast.success('Signup successful! Please login.');
       navigate('/login');
     } catch (error: any) {
-      console.error('Signup error:', error);
+      console.error('Signup error details:', error);
       const errorMessage = error.response?.data?.message || 'Signup failed. Please try again.';
       toast.error(errorMessage);
       setErrorMsg(errorMessage);
