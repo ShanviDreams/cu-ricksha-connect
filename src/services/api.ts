@@ -1,11 +1,11 @@
 
 import axios from 'axios';
 
-// Use environment variable if available, otherwise use the production URL
-const API_URL = 'https://cu-e-ricksha-backend.onrender.com/api';
+// Use environment variable if available, otherwise use development URL
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // Flag for development mode
-const isDev = import.meta.env.DEV;
+const isDev = import.meta.env.DEV && !import.meta.env.VITE_API_URL;
 
 // Create axios instance
 const api = axios.create({
@@ -13,7 +13,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  // Add a longer timeout for Render's free tier cold starts
+  // Add a longer timeout for slower connections
   timeout: 30000,
 });
 
@@ -32,7 +32,7 @@ api.interceptors.request.use(
 // Mock data for development/testing
 const mockUsers = {
   teachers: [
-    { id: 'teacher1', name: 'Test Teacher', employeeId: 'T12345', role: 'teacher' }
+    { id: 'teacher1', name: 'Test Teacher', employeeId: 'T12345', role: 'employee' }
   ],
   drivers: [
     { id: 'driver1', name: 'Test Driver', mobileNumber: '1234567890', isAvailable: true, role: 'driver' },
@@ -49,13 +49,13 @@ export const authAPI = {
     employeeId?: string; 
     password?: string; 
     mobileNumber?: string;
-    role: 'teacher' | 'driver' | 'employee'
+    role: 'employee' | 'driver'
   }) => {
     if (isDev) {
       console.log('Using mock login for development');
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
       
-      if (credentials.role === 'teacher' || credentials.role === 'employee') {
+      if (credentials.role === 'employee') {
         const teacher = mockUsers.teachers.find(t => t.employeeId === credentials.employeeId);
         if (teacher) {
           return { token: 'mock-token', user: teacher };
@@ -69,15 +69,17 @@ export const authAPI = {
       throw new Error('Invalid credentials');
     }
 
-    const endpoint = credentials.role === 'teacher' || credentials.role === 'employee' 
+    const endpoint = credentials.role === 'employee' 
       ? '/auth/employee/login' 
       : '/auth/driver/login';
       
     try {
+      console.log(`Making login request to ${endpoint}`, credentials);
       const response = await api.post(endpoint, credentials);
+      console.log('Login response:', response.data);
       return response.data;
-    } catch (error) {
-      console.error('Login API error:', error);
+    } catch (error: any) {
+      console.error('Login API error:', error.response?.data || error.message);
       throw error;
     }
   },
@@ -87,18 +89,18 @@ export const authAPI = {
     employeeId?: string;
     password?: string;
     mobileNumber?: string;
-    role: 'teacher' | 'driver' | 'employee';
+    role: 'employee' | 'driver';
   }) => {
     if (isDev) {
       console.log('Using mock signup for development');
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
       
-      if (userData.role === 'teacher' || userData.role === 'employee') {
+      if (userData.role === 'employee') {
         const newTeacher = { 
           id: `teacher${Date.now()}`, 
           name: userData.name, 
           employeeId: userData.employeeId, 
-          role: 'teacher' 
+          role: 'employee' 
         };
         mockUsers.teachers.push(newTeacher);
         return { token: 'mock-token', user: newTeacher };
@@ -115,26 +117,28 @@ export const authAPI = {
       }
     }
 
-    const endpoint = userData.role === 'teacher' || userData.role === 'employee'
+    const endpoint = userData.role === 'employee'
       ? '/auth/employee/signup' 
       : '/auth/driver/signup';
       
     try {
+      console.log(`Making signup request to ${endpoint}`, userData);
       const response = await api.post(endpoint, userData);
+      console.log('Signup response:', response.data);
       return response.data;
-    } catch (error) {
-      console.error('Signup API error:', error);
+    } catch (error: any) {
+      console.error('Signup API error:', error.response?.data || error.message);
       throw error;
     }
   },
 
-  // New method for deleting account
-  deleteAccount: async (userId: string, role: 'teacher' | 'driver' | 'employee') => {
+  // Method for deleting account
+  deleteAccount: async (userId: string, role: 'employee' | 'driver') => {
     if (isDev) {
       console.log('Using mock account deletion for development');
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
       
-      if (role === 'teacher' || role === 'employee') {
+      if (role === 'employee') {
         mockUsers.teachers = mockUsers.teachers.filter(t => t.id !== userId);
       } else {
         mockUsers.drivers = mockUsers.drivers.filter(d => d.id !== userId);
@@ -142,12 +146,12 @@ export const authAPI = {
       return { success: true, message: 'Account deleted successfully' };
     }
 
-    const endpoint = `/auth/${role === 'teacher' || role === 'employee' ? 'employee' : 'driver'}/delete-account`;
+    const endpoint = `/auth/${role === 'employee' ? 'employee' : 'driver'}/delete-account`;
     try {
       const response = await api.delete(endpoint);
       return response.data;
-    } catch (error) {
-      console.error('Account deletion API error:', error);
+    } catch (error: any) {
+      console.error('Account deletion API error:', error.response?.data || error.message);
       throw error;
     }
   }

@@ -2,14 +2,18 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/admin.controller');
+const { authMiddleware } = require('../middleware/auth');
 
-// Clear entire database
-router.post('/clear-all', adminController.clearDatabase);
+// Get all employees and drivers
+router.get('/employees', authMiddleware, adminController.getAllEmployees);
+router.get('/drivers', authMiddleware, adminController.getAllDrivers);
 
-// Clear all employees
-router.post('/clear-employees', adminController.clearEmployees);
+// Delete all employees and drivers
+router.delete('/employees', authMiddleware, adminController.deleteAllEmployees);
+router.delete('/drivers', authMiddleware, adminController.deleteAllDrivers);
+router.delete('/bookings', authMiddleware, adminController.deleteAllBookings);
 
-// Clear all drivers
-router.post('/clear-drivers', adminController.clearDrivers);
+// Create admin account
+router.post('/create', adminController.createAdmin);
 
 module.exports = router;

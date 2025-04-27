@@ -27,6 +27,8 @@ const SignupForm = () => {
 
   const handleTeacherSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Form validation
     if (!teacherName || !employeeId || !password || !confirmPassword) {
       toast.error('Please fill all fields');
       return;
@@ -39,15 +41,19 @@ const SignupForm = () => {
 
     try {
       setIsLoading(true);
-      console.log('Teacher signup payload:', { name: teacherName, employeeId, password, role: 'teacher' });
       
-      // Use the local API for testing if in development environment
-      const response = await authAPI.signup({
+      // Prepare payload
+      const payload = {
         name: teacherName,
         employeeId,
         password,
-        role: 'teacher'
-      });
+        role: 'employee' as const
+      };
+      
+      console.log('Employee signup payload:', payload);
+      
+      // Make API call
+      const response = await authAPI.signup(payload);
       
       console.log('Signup successful:', response);
       toast.success('Signup successful! Please login.');
@@ -64,6 +70,8 @@ const SignupForm = () => {
 
   const handleDriverSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Form validation
     if (!driverName || !mobileNumber || !driverPassword || !driverConfirmPassword) {
       toast.error('Please fill all fields');
       return;
@@ -76,19 +84,19 @@ const SignupForm = () => {
 
     try {
       setIsLoading(true);
-      console.log('Driver signup payload:', { 
+      
+      // Prepare payload
+      const payload = { 
         name: driverName, 
         mobileNumber, 
         password: driverPassword, 
-        role: 'driver' 
-      });
+        role: 'driver' as const
+      };
       
-      const response = await authAPI.signup({
-        name: driverName,
-        mobileNumber,
-        password: driverPassword,
-        role: 'driver'
-      });
+      console.log('Driver signup payload:', payload);
+      
+      // Make API call
+      const response = await authAPI.signup(payload);
       
       console.log('Signup successful:', response);
       toast.success('Signup successful! Please login.');

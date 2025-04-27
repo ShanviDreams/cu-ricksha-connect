@@ -6,15 +6,21 @@ const jwt = require('jsonwebtoken');
 // Generate JWT
 const generateToken = (user, role) => {
   return jwt.sign(
-    { id: user.id, role },
-    process.env.JWT_SECRET,
+    { id: user._id, role },
+    process.env.JWT_SECRET || 'cu_ericksha_secret_2024@akash',
     { expiresIn: '30d' }
   );
 };
 
 exports.employeeSignup = async (req, res) => {
   try {
+    console.log('Employee signup request:', req.body);
     const { name, employeeId, password, department, position } = req.body;
+
+    // Validate input
+    if (!name || !employeeId || !password) {
+      return res.status(400).json({ message: 'Please provide name, employeeId and password' });
+    }
 
     // Check if employee already exists
     const existingEmployee = await Employee.findOne({ employeeId });
@@ -27,12 +33,13 @@ exports.employeeSignup = async (req, res) => {
       name,
       employeeId,
       password,
-      department,
-      position
+      department: department || '',
+      position: position || ''
     });
 
     // Save employee to database
     await employee.save();
+    console.log('Employee created successfully:', employee._id);
 
     // Generate token
     const token = generateToken(employee, 'employee');
@@ -50,13 +57,19 @@ exports.employeeSignup = async (req, res) => {
     });
   } catch (error) {
     console.error('Employee signup error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
 exports.employeeLogin = async (req, res) => {
   try {
+    console.log('Employee login request:', req.body);
     const { employeeId, password } = req.body;
+
+    // Validate input
+    if (!employeeId || !password) {
+      return res.status(400).json({ message: 'Please provide employeeId and password' });
+    }
 
     // Check if employee exists
     const employee = await Employee.findOne({ employeeId });
@@ -69,6 +82,8 @@ exports.employeeLogin = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
+
+    console.log('Employee login successful:', employee._id);
 
     // Generate token
     const token = generateToken(employee, 'employee');
@@ -86,13 +101,19 @@ exports.employeeLogin = async (req, res) => {
     });
   } catch (error) {
     console.error('Employee login error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
 exports.driverSignup = async (req, res) => {
   try {
+    console.log('Driver signup request:', req.body);
     const { name, mobileNumber, password, rickshawNumber, location } = req.body;
+
+    // Validate input
+    if (!name || !mobileNumber || !password) {
+      return res.status(400).json({ message: 'Please provide name, mobileNumber and password' });
+    }
 
     // Check if driver already exists
     const existingDriver = await Driver.findOne({ mobileNumber });
@@ -106,12 +127,13 @@ exports.driverSignup = async (req, res) => {
       mobileNumber,
       password,
       isAvailable: false,
-      rickshawNumber,
-      location
+      rickshawNumber: rickshawNumber || '',
+      location: location || ''
     });
 
     // Save driver to database
     await driver.save();
+    console.log('Driver created successfully:', driver._id);
 
     // Generate token
     const token = generateToken(driver, 'driver');
@@ -130,13 +152,19 @@ exports.driverSignup = async (req, res) => {
     });
   } catch (error) {
     console.error('Driver signup error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
 exports.driverLogin = async (req, res) => {
   try {
+    console.log('Driver login request:', req.body);
     const { mobileNumber, password } = req.body;
+
+    // Validate input
+    if (!mobileNumber || !password) {
+      return res.status(400).json({ message: 'Please provide mobileNumber and password' });
+    }
 
     // Check if driver exists
     const driver = await Driver.findOne({ mobileNumber });
@@ -149,6 +177,8 @@ exports.driverLogin = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
+
+    console.log('Driver login successful:', driver._id);
 
     // Generate token
     const token = generateToken(driver, 'driver');
@@ -167,7 +197,7 @@ exports.driverLogin = async (req, res) => {
     });
   } catch (error) {
     console.error('Driver login error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
@@ -192,7 +222,7 @@ exports.getCurrentUser = async (req, res) => {
         }
       });
     } else if (role === 'driver') {
-      const driver = await Driver.findById(id);
+      const driver = await Driver.findById(id).select('-password');
       if (!driver) {
         return res.status(404).json({ message: 'Driver not found' });
       }
@@ -213,6 +243,6 @@ exports.getCurrentUser = async (req, res) => {
     return res.status(400).json({ message: 'Invalid user role' });
   } catch (error) {
     console.error('Get current user error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };

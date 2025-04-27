@@ -1,7 +1,6 @@
 
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth.routes');
 const driverRoutes = require('./routes/driver.routes');
 const bookingRoutes = require('./routes/booking.routes');
@@ -28,7 +27,10 @@ app.get('/', (req, res) => {
 // Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send({ message: 'Something went wrong!' });
+  res.status(500).send({ 
+    message: 'Something went wrong!',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
 });
 
 module.exports = app;

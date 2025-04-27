@@ -25,6 +25,8 @@ const LoginForm = () => {
 
   const handleEmployeeLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Form validation
     if (!employeeId || !employeePassword) {
       toast.error('Please fill all the fields');
       return;
@@ -32,18 +34,29 @@ const LoginForm = () => {
 
     try {
       setIsLoading(true);
-      const response = await authAPI.login({
+      
+      // Prepare payload
+      const payload = {
         employeeId,
         password: employeePassword,
-        role: 'employee'
-      });
+        role: 'employee' as const
+      };
+      
+      console.log('Employee login payload:', payload);
+      
+      // Make API call
+      const response = await authAPI.login(payload);
+      
+      console.log('Login response:', response);
       
       login(response.token, response.user);
       toast.success('Login successful!');
       navigate('/teacher-dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
-      toast.error('Invalid credentials. Please try again.');
+      // Show more specific error message if available from the API response
+      const errorMessage = error.response?.data?.message || 'Invalid credentials. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -51,6 +64,8 @@ const LoginForm = () => {
 
   const handleDriverLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Form validation
     if (!mobileNumber || !driverPassword) {
       toast.error('Please fill all the fields');
       return;
@@ -58,18 +73,29 @@ const LoginForm = () => {
 
     try {
       setIsLoading(true);
-      const response = await authAPI.login({
+      
+      // Prepare payload
+      const payload = {
         mobileNumber,
         password: driverPassword,
-        role: 'driver'
-      });
+        role: 'driver' as const
+      };
+      
+      console.log('Driver login payload:', payload);
+      
+      // Make API call
+      const response = await authAPI.login(payload);
+      
+      console.log('Login response:', response);
       
       login(response.token, response.user);
       toast.success('Login successful!');
       navigate('/driver-dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
-      toast.error('Invalid credentials. Please try again.');
+      // Show more specific error message if available from the API response
+      const errorMessage = error.response?.data?.message || 'Invalid credentials. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
