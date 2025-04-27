@@ -25,7 +25,7 @@ const LoginForm = () => {
 
   // Effect to redirect user if already authenticated
   useEffect(() => {
-    console.log("LoginForm auth state:", { isAuthenticated, userRole: user?.role });
+    console.log("LoginForm auth state check:", { isAuthenticated, userRole: user?.role });
     
     if (isAuthenticated && user) {
       const redirectPath = user.role === 'teacher' 
@@ -66,6 +66,8 @@ const LoginForm = () => {
       // Update auth context
       login(response.token, response.user);
       toast.success('Login successful!');
+      
+      // Redirect happens in useEffect above
     } catch (error: any) {
       console.error('Login error:', error);
       // Show more specific error message if available from the API response
@@ -105,6 +107,8 @@ const LoginForm = () => {
       // Update auth context
       login(response.token, response.user);
       toast.success('Login successful!');
+      
+      // Redirect happens in useEffect above
     } catch (error: any) {
       console.error('Login error:', error);
       // Show more specific error message if available from the API response

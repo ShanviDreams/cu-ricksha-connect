@@ -29,6 +29,15 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Add response interceptor for better error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('API Error:', error.response?.data || error.message);
+    return Promise.reject(error);
+  }
+);
+
 // Mock data for development/testing
 const mockUsers = {
   teachers: [
@@ -56,6 +65,17 @@ export const authAPI = {
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
       
       if (credentials.role === 'employee') {
+        // For testing, accept CU12345 as a valid employeeId with any password
+        if (credentials.employeeId === 'CU12345') {
+          const teacher = {
+            id: 'teacher_mock',
+            name: 'Test Teacher',
+            employeeId: credentials.employeeId,
+            role: 'employee'
+          };
+          return { token: 'mock-token', user: teacher };
+        }
+        
         const teacher = mockUsers.teachers.find(t => t.employeeId === credentials.employeeId);
         if (teacher) {
           return { token: 'mock-token', user: teacher };
@@ -96,6 +116,11 @@ export const authAPI = {
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
       
       if (userData.role === 'employee') {
+        // Check if employee already exists
+        if (mockUsers.teachers.some(t => t.employeeId === userData.employeeId)) {
+          throw new Error('Employee ID already exists');
+        }
+        
         const newTeacher = { 
           id: `teacher${Date.now()}`, 
           name: userData.name, 
@@ -105,6 +130,11 @@ export const authAPI = {
         mockUsers.teachers.push(newTeacher);
         return { token: 'mock-token', user: newTeacher };
       } else {
+        // Check if driver already exists
+        if (mockUsers.drivers.some(d => d.mobileNumber === userData.mobileNumber)) {
+          throw new Error('Mobile number already exists');
+        }
+        
         const newDriver = { 
           id: `driver${Date.now()}`, 
           name: userData.name, 

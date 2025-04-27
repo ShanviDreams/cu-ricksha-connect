@@ -18,7 +18,14 @@ import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import socketService from "./services/socket";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 30000,
+    },
+  },
+});
 
 // Protected route component
 const ProtectedRoute = ({ 
@@ -76,12 +83,12 @@ const LoginRoute = ({ children }: { children: JSX.Element }) => {
   }
   
   // If authenticated, redirect to appropriate dashboard
-  if (isAuthenticated) {
+  if (isAuthenticated && user) {
     console.log("Already authenticated, redirecting to dashboard");
-    if (user?.role === 'teacher') {
+    if (user.role === 'teacher') {
       return <Navigate to="/teacher-dashboard" replace />;
     }
-    if (user?.role === 'driver') {
+    if (user.role === 'driver') {
       return <Navigate to="/driver-dashboard" replace />;
     }
   }
@@ -91,6 +98,11 @@ const LoginRoute = ({ children }: { children: JSX.Element }) => {
 };
 
 const AppRoutes = () => {
+  const { isAuthenticated, user } = useAuth();
+  
+  // Log route state on every render
+  console.log("AppRoutes render - Auth state:", { isAuthenticated, userRole: user?.role });
+  
   return (
     <Routes>
       <Route path="/" element={<Index />} />
