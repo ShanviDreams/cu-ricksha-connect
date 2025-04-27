@@ -51,7 +51,12 @@ const LoginForm = () => {
       
       login(response.token, response.user);
       toast.success('Login successful!');
-      navigate('/teacher-dashboard');
+      
+      // Ensure navigation happens after state updates
+      setTimeout(() => {
+        console.log('Navigating to teacher dashboard...');
+        navigate('/teacher-dashboard', { replace: true });
+      }, 100);
     } catch (error: any) {
       console.error('Login error:', error);
       // Show more specific error message if available from the API response
@@ -90,7 +95,12 @@ const LoginForm = () => {
       
       login(response.token, response.user);
       toast.success('Login successful!');
-      navigate('/driver-dashboard');
+      
+      // Ensure navigation happens after state updates
+      setTimeout(() => {
+        console.log('Navigating to driver dashboard...');
+        navigate('/driver-dashboard', { replace: true });
+      }, 100);
     } catch (error: any) {
       console.error('Login error:', error);
       // Show more specific error message if available from the API response

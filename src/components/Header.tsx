@@ -1,5 +1,6 @@
+
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -9,8 +10,21 @@ const Header = () => {
   const { theme, toggleTheme } = useTheme();
   const { isAuthenticated, user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+    setIsMenuOpen(false);
+  };
+  
+  const getDashboardLink = () => {
+    if (!user) return '/';
+    
+    return user.role === 'teacher' ? '/teacher-dashboard' : '/driver-dashboard';
+  };
 
   return (
     <header className="bg-primary text-white shadow-md">
@@ -43,9 +57,14 @@ const Header = () => {
                 <span className="text-sm">
                   Welcome, {user?.name} ({user?.role})
                 </span>
+                <Link to={getDashboardLink()}>
+                  <Button variant="ghost" className="text-white hover:bg-primary/80">
+                    Dashboard
+                  </Button>
+                </Link>
                 <Button 
                   variant="secondary" 
-                  onClick={logout}
+                  onClick={handleLogout}
                   className="bg-cu-gold text-black hover:bg-cu-gold/90"
                 >
                   Logout
@@ -82,6 +101,67 @@ const Header = () => {
             </Button>
           </div>
         </nav>
+        
+        {/* Mobile menu */}
+        {isMenuOpen && (
+          <div className="md:hidden pt-4 pb-2 space-y-3 animate-fade-in">
+            {isAuthenticated ? (
+              <>
+                <div className="px-2 py-1 text-sm font-medium">
+                  Welcome, {user?.name} ({user?.role})
+                </div>
+                <Link 
+                  to={getDashboardLink()} 
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block px-2 py-1 hover:bg-primary/80 rounded"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-2 py-1 text-cu-gold hover:bg-primary/80 rounded"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link 
+                  to="/login" 
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block px-2 py-1 hover:bg-primary/80 rounded"
+                >
+                  Login
+                </Link>
+                <Link 
+                  to="/signup" 
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block px-2 py-1 text-cu-gold hover:bg-primary/80 rounded"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
+            <div className="px-2 py-1">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={toggleTheme}
+                className="text-white hover:bg-primary/80 p-0"
+              >
+                {theme === 'dark' ? (
+                  <div className="flex items-center">
+                    <Sun size={16} className="mr-2" /> Light Mode
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    <Moon size={16} className="mr-2" /> Dark Mode
+                  </div>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
