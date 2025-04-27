@@ -51,9 +51,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = (token: string, userData: User) => {
     console.log("Login called with:", { token, userData });
     
-    // Handle API response that uses 'employee' role instead of 'teacher'
+    // Fix the comparison - use equality check with 'employee' string instead of the type
     if (userData.role === 'employee') {
-      userData.role = 'teacher' as 'teacher';
+      userData.role = 'teacher';
     }
     
     localStorage.setItem('token', token);
