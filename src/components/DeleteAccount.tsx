@@ -19,7 +19,9 @@ const DeleteAccount = () => {
     
     try {
       setIsDeleting(true);
-      await authAPI.deleteAccount(user.id, user.role);
+      // Map 'teacher' role to 'employee' for API compatibility
+      const apiRole = user.role === 'teacher' ? 'employee' : user.role;
+      await authAPI.deleteAccount(user.id, apiRole);
       toast.success("Your account has been deleted successfully");
       logout();
       navigate("/");

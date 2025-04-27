@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 interface User {
   id: string;
   name: string;
-  role: 'teacher' | 'driver';
+  role: 'teacher' | 'driver';  // Note: Internally we use 'teacher' but API uses 'employee'
   employeeId?: string;
   mobileNumber?: string;
   isAvailable?: boolean;

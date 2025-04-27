@@ -146,7 +146,7 @@ export const authAPI = {
       return { success: true, message: 'Account deleted successfully' };
     }
 
-    const endpoint = `/auth/${role === 'employee' ? 'employee' : 'driver'}/delete-account`;
+    const endpoint = `/auth/${role}/delete-account`;
     try {
       const response = await api.delete(endpoint);
       return response.data;
