@@ -51,8 +51,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = (token: string, userData: User) => {
     console.log("Login called with:", { token, userData });
     
-    // Fix the comparison - use equality check with 'employee' string instead of the type
-    if (userData.role === 'employee') {
+    // Fix type comparison by checking against string value, not type
+    // The API returns 'employee' as a string, not as a TypeScript type
+    if (userData.role === 'employee' as any) {
       userData.role = 'teacher';
     }
     
