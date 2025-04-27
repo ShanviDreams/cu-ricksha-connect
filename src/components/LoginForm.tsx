@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
   
   // Employee login state
   const [employeeId, setEmployeeId] = useState('');
@@ -22,6 +22,20 @@ const LoginForm = () => {
   const [driverPassword, setDriverPassword] = useState('');
   
   const [isLoading, setIsLoading] = useState(false);
+
+  // Effect to redirect user if already authenticated
+  useEffect(() => {
+    console.log("LoginForm auth state:", { isAuthenticated, userRole: user?.role });
+    
+    if (isAuthenticated && user) {
+      const redirectPath = user.role === 'teacher' 
+        ? '/teacher-dashboard' 
+        : '/driver-dashboard';
+        
+      console.log(`User authenticated, redirecting to: ${redirectPath}`);
+      navigate(redirectPath, { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const handleEmployeeLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,14 +63,9 @@ const LoginForm = () => {
       
       console.log('Login response:', response);
       
+      // Update auth context
       login(response.token, response.user);
       toast.success('Login successful!');
-      
-      // Ensure navigation happens after state updates
-      setTimeout(() => {
-        console.log('Navigating to teacher dashboard...');
-        navigate('/teacher-dashboard', { replace: true });
-      }, 100);
     } catch (error: any) {
       console.error('Login error:', error);
       // Show more specific error message if available from the API response
@@ -93,14 +102,9 @@ const LoginForm = () => {
       
       console.log('Login response:', response);
       
+      // Update auth context
       login(response.token, response.user);
       toast.success('Login successful!');
-      
-      // Ensure navigation happens after state updates
-      setTimeout(() => {
-        console.log('Navigating to driver dashboard...');
-        navigate('/driver-dashboard', { replace: true });
-      }, 100);
     } catch (error: any) {
       console.error('Login error:', error);
       // Show more specific error message if available from the API response

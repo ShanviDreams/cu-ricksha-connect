@@ -32,6 +32,8 @@ const ProtectedRoute = ({
 }) => {
   const { isAuthenticated, user, loading } = useAuth();
   
+  console.log("ProtectedRoute check:", { isAuthenticated, userRole: user?.role, allowedRole, loading });
+  
   // Show nothing while checking authentication
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
@@ -39,11 +41,13 @@ const ProtectedRoute = ({
   
   // Not authenticated
   if (!isAuthenticated) {
+    console.log("Not authenticated, redirecting to:", redirectPath);
     return <Navigate to={redirectPath} replace />;
   }
   
   // Check role if specified
   if (allowedRole && user?.role !== allowedRole) {
+    console.log("Role mismatch, redirecting based on user role");
     // Redirect to appropriate dashboard based on role
     if (user?.role === 'teacher') {
       return <Navigate to="/teacher-dashboard" replace />;
@@ -56,12 +60,15 @@ const ProtectedRoute = ({
   }
   
   // All checks passed, render the protected component
+  console.log("Access granted to protected route");
   return children;
 };
 
 // Login route component to redirect if already logged in
 const LoginRoute = ({ children }: { children: JSX.Element }) => {
   const { isAuthenticated, user, loading } = useAuth();
+  
+  console.log("LoginRoute check:", { isAuthenticated, userRole: user?.role, loading });
   
   // Show nothing while checking authentication
   if (loading) {
@@ -70,6 +77,7 @@ const LoginRoute = ({ children }: { children: JSX.Element }) => {
   
   // If authenticated, redirect to appropriate dashboard
   if (isAuthenticated) {
+    console.log("Already authenticated, redirecting to dashboard");
     if (user?.role === 'teacher') {
       return <Navigate to="/teacher-dashboard" replace />;
     }
@@ -78,6 +86,7 @@ const LoginRoute = ({ children }: { children: JSX.Element }) => {
     }
   }
   
+  // User not authenticated, show login page
   return children;
 };
 

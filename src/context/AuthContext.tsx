@@ -32,19 +32,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const storedUser = localStorage.getItem('user');
     
     if (token && storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      setIsAuthenticated(true);
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        console.log("Restored user from localStorage:", parsedUser);
+        setUser(parsedUser);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error("Failed to parse stored user:", error);
+        // Clear invalid storage
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
     }
     
     setLoading(false);
   }, []);
 
   const login = (token: string, userData: User) => {
+    console.log("Login called with:", { token, userData });
+    
+    // Handle API response that uses 'employee' role instead of 'teacher'
+    if (userData.role === 'employee') {
+      userData.role = 'teacher' as 'teacher';
+    }
+    
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
     setIsAuthenticated(true);
+    
+    console.log("Auth state updated:", { user: userData, isAuthenticated: true });
   };
 
   const logout = () => {
@@ -52,6 +69,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem('user');
     setUser(null);
     setIsAuthenticated(false);
+    console.log("User logged out, auth state reset");
   };
 
   const updateUserAvailability = (isAvailable: boolean) => {
